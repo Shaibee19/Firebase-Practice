@@ -54,18 +54,33 @@
   font-size: 20px;
   padding: 8px;
   font-weight: bold;
+  text-decoration: none;
 }
 
 .header__btn--list {
-  border: solid 2px;
-  border-radius: 999px;
-  color: #7342d6;
   margin-left: 32px;
   margin-right: 16px;
 }
 
-.header__btn--list:hover {
-  color: #482b83;
+.header__btn--list::marker {
+  text-decoration: none;
+}
+
+.btn__menu,
+.header__btn {
+  cursor: pointer;
+  border: solid 5px #482b83;
+  border-radius: 999px;
+  font-size: 16px;
+  background-color: rgb(25, 25, 25);
+  color: white;
+  padding: 5px 15px;
+  text-decoration: none;
+}
+
+.btn__menu:hover,
+.header__btn:hover {
+  border: solid 5px;
   text-decoration: underline;
 }
 
@@ -73,8 +88,8 @@
   background-color: #7342d6;
   margin-left: 32px;
   margin-right: 16px;
-  width: 20px;
-  height: 20px;
-  border: solid 2px;
+  width: 40px;
+  height: 40px;
+  border: solid 3px;
   border-radius: 999px;
 }

@@ -16,7 +16,7 @@ function App() {
   React.useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setLoading(false);
-      console.log(user.email[0].toUpperCase());
+      // console.log(user.email[0].toUpperCase());
       if (user) {
         setUser(user);
       }
@@ -50,6 +50,10 @@ function App() {
     setUser({});
   }
 
+  function profileLoaded() {
+    console.log('profileLoaded')
+  }
+
   return (
     <div className="App">
       <header className="header">
@@ -61,16 +65,16 @@ function App() {
               </button>
             </li>
             <li className="header__btn--list">
-              <button onClick={register}>Register</button>
+              <button className="header__btn" onClick={register} onLoad={profileLoaded}>Register</button>
             </li>
             <li className="header__btn--list">
-              <button onClick={login}>Login</button>
+              <button className="header__btn" onClick={login}>Login</button>
             </li>
             <li className="header__btn--list">
-              <button onClick={logout}>Logout</button>
+              <button className="header__btn" onClick={logout}>Logout</button>
             </li>
             <li className="header__btn--icon">
-              {/* <button onClick={logout}>{user.email[0].toUpperCase()}</button> */}
+              {/* <button className="header__btn" onClick={logout}>{user.email[0].toUpperCase()}</button> */}
             </li>
             {loading ? "loading..." : user.email}
           </ul>
