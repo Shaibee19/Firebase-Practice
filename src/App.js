@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { auth } from "./firebase/init";
+import { auth, db } from "./firebase/init";
+import { collection, addDoc, getDocs, getDoc, doc, query, where, updateDoc, deleteDoc } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -13,6 +14,58 @@ function App() {
   const [user, setUser] = React.useState(null); // Initialize with null
   const [img, setImg] = useState();
   const [loading, setLoading] = React.useState(true);
+
+  async function updatePost() {
+    const hardcodeID = "6XY0SqiVvMnC7mW8321o";
+    const postRef = doc(db, "posts", hardcodeID);
+    const post = await getPostById(hardcodeID);
+    console.log(post)
+    const newPost = {
+      ...post, // if you just want to target one element and just change the description, for example
+      description: "Complete FES",
+      // uid: user.id,
+    };
+    console.log(newPost);
+    updateDoc(postRef, newPost);
+  }
+
+  function deletePost() {
+    const hardcodeID = "6XY0SqiVvMnC7mW8321o";
+    const postRef = doc(db, "posts", hardcodeID);
+    deleteDoc(postRef);
+  }
+
+  function createPost() {
+    const post = {
+      title: "Do Firebase Section",
+      description: "Finish FESimplified",
+      uid: user.uid,
+    };
+    addDoc(collection(db, "posts"), post)
+  }
+
+  async function getAllPosts() {
+    const { docs } = await getDocs(collection(db, "posts"));
+    const posts = docs.map(elem => ({ ...elem.data(), id: elem.id }));
+    console.log(posts)
+  }
+
+  async function getPostById(ID) {
+    const postRef = doc(db, "posts", ID);
+    const postSnap = await getDoc(postRef);
+    // if (postSnap.exists()) {
+      return postSnap.data();
+    // }
+  }
+
+  async function getPostByUid() {
+    const postCollectionRef = await query(
+      collection(db, "posts"),
+      where("uid", "==", user.uid)
+    );
+    const { docs } = await getDocs(postCollectionRef);
+    console.log(docs.map(doc => doc.data));
+  }
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => { // Renamed user to currentUser to avoid conflict
@@ -112,6 +165,12 @@ function App() {
                   )}
                 </li>
                 {loading ? "loading..." : (user ? user.email : "Not logged in")} {/* Conditional rendering for user.email */}
+                <button className="header__btn post" onClick={createPost}>Create Post</button>
+                <button className="header__btn post" onClick={getAllPosts}>Get All Posts</button>
+                <button className="header__btn post" onClick={getPostById}>Get Post By ID</button>
+                <button className="header__btn post" onClick={getPostByUid}>Get Post By UID</button>
+                <button className="header__btn post" onClick={updatePost}>Update Post</button>
+                <button className="header__btn post" onClick={deletePost}>Delete Post</button>
               </ul>
             </div>
           </>
