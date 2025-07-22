@@ -10,18 +10,22 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function App() {
-  const [user, setUser] = React.useState({});
-  const [img, setImg] = useState()
+  const [user, setUser] = React.useState(null); // Initialize with null
+  const [img, setImg] = useState();
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => { // Renamed user to currentUser to avoid conflict
       setLoading(false);
-      // console.log(user.email[0].toUpperCase());
-      if (user) {
-        setUser(user);
+      if (currentUser) {
+        setUser(currentUser);
+        // It's safe to log here because currentUser is not null
+        console.log(currentUser.email[0].toUpperCase());
+      } else {
+        setUser(null); // Ensure user is null when no one is logged in
       }
     });
+    return () => unsubscribe(); // Cleanup subscription
   }, []);
 
   useEffect(() => {
@@ -30,8 +34,8 @@ function App() {
       setTimeout(() => {
         setImg(image);
       }, 300);
-    }
-  })
+    };
+  }, []); // Add empty dependency array to run once
 
   function register() {
     console.log("register");
@@ -57,13 +61,22 @@ function App() {
 
   function logout() {
     signOut(auth);
-    setUser({});
+    setUser(null); // Set user to null on logout
   }
 
   return (
     <div className="App">
       <header className="header">
         {loading ? (
+          <>
+            <div className="header__loading--skeleton">
+              <div className="header__btn--skeleton"></div>
+              <div className="header__btn--skeleton"></div>
+              <div className="header__btn--skeleton"></div>
+              <div className="header__btn--skeleton"></div>
+            </div>
+          </>
+        ) : (
           <>
             <div className="header__container">
               <ul className="header__btns">
@@ -73,10 +86,7 @@ function App() {
                   </button>
                 </li>
                 <li className="header__btn--list">
-                  <button
-                    className="header__btn"
-                    onClick={register}
-                  >
+                  <button className="header__btn" onClick={register}>
                     Register
                   </button>
                 </li>
@@ -91,21 +101,18 @@ function App() {
                   </button>
                 </li>
                 <li className="header__btn--list">
-                  <button className="header__btn--icon" onClick={logout}>
-                    {user.email[0].toUpperCase()}
-                  </button>
+                  {user && user.email ? ( // Conditional rendering for user email initial
+                    <button className="header__btn--icon" onClick={logout}>
+                      {user.email[0].toUpperCase()}
+                    </button>
+                  ) : (
+                    <button className="header__btn--icon">
+                       ? {/* Or some default icon/text when no user */}
+                    </button>
+                  )}
                 </li>
-                {loading ? "loading..." : user.email}
+                {loading ? "loading..." : (user ? user.email : "Not logged in")} {/* Conditional rendering for user.email */}
               </ul>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="header__loading--skeleton">
-              <div className="header__btn--skeleton"></div>
-              <div className="header__btn--skeleton"></div>
-              <div className="header__btn--skeleton"></div>
-              <div className="header__btn--skeleton"></div>
             </div>
           </>
         )}
